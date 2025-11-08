@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 import openpyxl
 from openpyxl.styles import Font, Border, Side, Alignment, PatternFill
 
+
 TIPOS_TITULOS = ["ltn", "ntn-c", "lft", "ntn-b", "ntn-f"]
 URL_BASE = "https://www.anbima.com.br/informacoes/merc-sec/resultados/msec_{data_url}_{tipo}.asp"
 
@@ -16,6 +17,7 @@ MESES_PT = {
     7: 'jul', 8: 'ago', 9: 'set', 10: 'out', 11: 'nov', 12: 'dez'
 }
 
+# Nomes das abas para a planilha
 NOMES_ABAS = {
     "ltn": "LTN",
     "ntn-c": "NTN-C",
@@ -24,14 +26,7 @@ NOMES_ABAS = {
     "ntn-f": "NTN-F"
 }
 
-NOME_PAPEL = {
-    "ltn": "LTN - Taxa (% a.a.)/252",
-    "ntn-c": "NTN-C - Taxa (% a.a.)/252",
-    "lft": "LFT - Rentabilidade (% a.a.)/252",
-    "ntn-b": "NTN-B - Taxa (% a.a.)/252",
-    "ntn-f": "NTN-F - Taxa (% a.a.)/252"
-}
-
+# A3 na planilha
 TIPO_PAPEL = {
     "ltn": "Papel PREFIXADO",
     "ntn-c": "Papel IGP-M",
@@ -40,12 +35,23 @@ TIPO_PAPEL = {
     "ntn-f": "Papel PREFIXADO"
 }
 
+# C3 na planilha
+NOME_PAPEL = {
+    "ltn": "LTN - Taxa (% a.a.)/252",
+    "ntn-c": "NTN-C - Taxa (% a.a.)/252",
+    "lft": "LFT - Rentabilidade (% a.a.)/252",
+    "ntn-b": "NTN-B - Taxa (% a.a.)/252",
+    "ntn-f": "NTN-F - Taxa (% a.a.)/252"
+}
+
+
 def formatar_data_anbima(data_obj: datetime) -> str:
     """Formata data no padrão ANBIMA: 31out2025"""
     dia = data_obj.strftime('%d')
     mes = MESES_PT[data_obj.month]
     ano = data_obj.strftime('%Y')
     return f"{dia}{mes}{ano}"
+
 
 def contar_dias_uteis_entre_datas(data_inicio: datetime, data_fim: datetime) -> int:
     """Conta o número de dias úteis entre duas datas (excluindo fins de semana)"""
@@ -59,6 +65,7 @@ def contar_dias_uteis_entre_datas(data_inicio: datetime, data_fim: datetime) -> 
         data_atual += timedelta(days=1)
     
     return dias_uteis
+
 
 def calcular_dia_util_anterior() -> tuple[str, str]:
     """Calcula o dia útil anterior (D-X)"""
@@ -76,6 +83,7 @@ def calcular_dia_util_anterior() -> tuple[str, str]:
     
     return data_str, delta_str
 
+
 def calcular_data_minima_permitida() -> str:
     """Calcula a data mínima permitida (5 dias úteis atrás)"""
     hoje = datetime.now()
@@ -89,6 +97,7 @@ def calcular_data_minima_permitida() -> str:
             dias_uteis_contados += 1
     
     return data_atual.strftime('%d/%m/%Y')
+
 
 def calcular_data_consulta() -> str:
     """Determina a data de consulta com validações"""
@@ -140,6 +149,7 @@ def gerar_link_anbima(data_consulta: str, tipo_titulo: str) -> str:
     data_url = formatar_data_anbima(data_obj)
     return URL_BASE.format(data_url=data_url, tipo=tipo_titulo)
 
+
 def extrair_dados_tabela(html_content: str) -> list:
     """Extrai os dados numéricos da tabela HTML da ANBIMA"""
     soup = BeautifulSoup(html_content, 'html.parser')
@@ -160,6 +170,7 @@ def extrair_dados_tabela(html_content: str) -> list:
             dados.append(linha)
     
     return dados
+
 
 def converter_valor_celula(valor: str, coluna: int):
     """Converte o valor conforme o tipo de coluna"""
@@ -186,6 +197,7 @@ def converter_valor_celula(valor: str, coluna: int):
             return float(valor.replace(',', '.'))
         except:
             return valor
+
 
 def aplicar_formatacao_linha_dados(ws, linha_idx, max_col=11):
     """Aplica formatação padrão para linhas de dados"""
@@ -218,6 +230,7 @@ def aplicar_formatacao_linha_dados(ws, linha_idx, max_col=11):
                 cell.number_format = '#,##0.000000'
         else:  # Taxas
             cell.number_format = '0.0000'
+
 
 def criar_arquivo_excel(data_consulta: str, dados_titulos: dict):
     """Cria o arquivo Excel com os dados extraídos"""
@@ -357,6 +370,7 @@ def criar_arquivo_excel(data_consulta: str, dados_titulos: dict):
     print(f"✅ Arquivo salvo: {nome_arquivo}")
     return nome_arquivo
 
+
 def processar_titulos(data_consulta: str):
     """Processa todos os tipos de títulos"""
     dados_titulos = {}
@@ -378,6 +392,7 @@ def processar_titulos(data_consulta: str):
             dados_titulos[titulo] = []
     
     return dados_titulos
+
 
 # --- Bloco Principal ---
 if __name__ == "__main__":

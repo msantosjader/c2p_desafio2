@@ -32,6 +32,9 @@ python -m msec 06/11/2025
 
 > Serão exibidas mensagens de erro caso estes requisitos não sejam atendidos.
 
+#### Demonstração
+![](imagens/python_msec.png)
+
 
 ## Estrutura do Projeto
 
